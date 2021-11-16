@@ -1,6 +1,6 @@
 module.exports = function FruitBasket(pool) {
 
-    async function newBasker(fruit_name, quantity, price) {
+    async function newBasket(fruit_name, quantity, price) {
         await pool.query('insert into basket (fruit_name, quantity, price) values($1, $2, $3)', [fruit_name, quantity, price])
     }
 
@@ -23,11 +23,11 @@ module.exports = function FruitBasket(pool) {
     async function showTotalQty(type) {
         const totalQty = await pool.query('select sum(price*quantity) as totalQty from basket where fruit_name = $1', [type])
         
-        return quantity.rows[0].totalQty;
+        return totalQty.rows[0].totalPrice;
     }
 
     return {
-        newBasker,
+        newBasket,
         findAllFruits,
         updateFruitNumber,
         showTotalPrice,
