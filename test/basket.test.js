@@ -1,5 +1,5 @@
-let assert = require("assert");
-let fruitBasketFactory = require("../basket");
+const assert = require("assert");
+const fruitBasketFactory = require("../basket");
 const pg = require("pg");
 const Pool = pg.Pool;
 
@@ -10,29 +10,65 @@ const pool = new Pool({
 });
 
 describe('The fruitbasket function', function () {
-    let fruitBasket = fruitBasketFactory(pool);
 
     beforeEach(async function () {
         await pool.query("delete from basket;");
     });
 
-    it('should find all the fruit baskets for a given fruitBasket Banana,', async function () {
+    it('should create and return a new basket,', async function () {
+        let fruitBasket = fruitBasketFactory(pool);
 
-        await fruitBasket.newBasket('Banana', 1, '3.00');
+        await fruitBasket.newBasket('Apple', 1, '3.00');
 
-        assert.deepEqual(await fruitBasket.findAllFruits('Banana'), 
+        assert.deepEqual(await fruitBasket.findAllFruits('Apple'), 
         
-        [{fruit_name: 'Banana', price: '3.00', quantity: 1}])
+        [{fruit_name: 'Apple', quantity: 1, price: '3.00'}])
     });
 
-    it('should update the number of fruits in a given basket Banana', async function () {
-        await fruitBasket.newBasket('Banana', 1, '3.00');
-        await fruitBasket.updateFruitNumber('Banana', 3);
-        let find = await fruitBasket.findAllFruits('Banana');
-        assert.equal(find[0].quantity, 4);
+    it('should create a new basket and find the number of fruits in that basket', async function () {
+        let fruitBasket = fruitBasketFactory(pool);
+
+        await fruitBasket.newBasket('Apple', 1, '3.00');
+
+        let findFruits = await fruitBasket.findAllFruits('Apple');
+
+        assert.equal(findFruits[0].quantity, 1);
     });
 
-    
+    it('should create a new basket and update the number of fruits in that basket', async function () {
+        let fruitBasket = fruitBasketFactory(pool);
+
+        await fruitBasket.newBasket('Orange', 5, '15.00');
+        await fruitBasket.updateFruitNumber('Orange', 2);
+
+        let updateNumber = await fruitBasket.findAllFruits('Orange');
+        assert.equal(updateNumber[0].quantity, 7);
+    });
+
+    it('should create a new basket and show the total price of fruit contained in that basket', async function () {
+        let fruitBasket = fruitBasketFactory(pool);
+
+        await fruitBasket.newBasket('Apples', 3, '3.00');
+        await fruitBasket.newBasket('Banaba', 2, '2.00');
+        await fruitBasket.newBasket('Banana', 2, '2.00');
+        await fruitBasket.newBasket('Orange', 4, '4.00');
+        await fruitBasket.newBasket('Orange', 4, '4.00');
+       
+        assert.equal(await fruitBasket.showTotalPrice('Orange'), '32.00');
+        
+    });
+
+    it('should create a new basket and show the total number of fruit(s) contained in that basket', async function () {
+        let fruitBasket = fruitBasketFactory(pool);
+
+        await fruitBasket.newBasket('Banana', 1, '2.00');
+        await fruitBasket.newBasket('Banana', 1, '2.00');
+        await fruitBasket.newBasket('Apple', 1, '3.00');
+        await fruitBasket.newBasket('Apple', 1, '3.00');
+        await fruitBasket.newBasket('Orange', 1, '4.00');
+
+        assert.equal(2, await fruitBasket.showTotalQty('Banana'));
+    });
 
     after(function () {
         pool.end();
