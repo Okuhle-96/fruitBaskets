@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - 12
+
+env:
+  - DATABASE_URL=postgresql://postgres@localhost:5432/baskithi
+
+before_script:
+  - psql -c 'create database  baskithi;' -U postgres
+  - psql -U postgres -d baskithi -a -f basket.sql
+
+services:
+  - postgresql
