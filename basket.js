@@ -27,11 +27,11 @@ module.exports = function FruitBasket(pool) {
     }
 
     return {
-        createBasket,
-        findFruit,
-        updateFruit,
-        totalPrice,
-        totalQty
+        newBasker,
+        findAllFruits,
+        updateFruitNumber,
+        showTotalPrice,
+        showTotalQty
     }
 }
 
